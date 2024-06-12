@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ocorrência</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 0;
+        }
+
+        h1 {
+            color: #333;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1 id="message"></h1>
+
+    <script>
+        window.onload = function() {
+            var message = document.getElementById('message');
+            var text = 'F.C.O (Formulário de Controle de Ocorrência) By M&A';
+            var index = 0;
+
+            function displayText() {
+                if (index < text.length) {
+                    message.textContent += text.charAt(index);
+                    index++;
+                    setTimeout(displayText, 100); // Delay de 100 milissegundos entre cada letra
+                } else {
+                    setTimeout(function() {
+                        window.location.href = 'outra_pagina.html'; // Redireciona para outra página após a exibição completa da mensagem
+                    }, 1000); // Tempo de espera após a exibição completa da mensagem (1000ms = 1 segundo)
+                }
+            }
+
+            displayText();
+        };
+    </script>
+</body>
+</html>

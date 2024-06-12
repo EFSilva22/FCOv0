@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seu Componente</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9; /* Cinza claro */
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        input[type="text"] {
+            width: calc(100% - 16px);
+            padding: 8px;
+            margin-top: 5px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+
+        button {
+            padding: 8px 15px;
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            display: block;
+        }
+
+        button.addProductButton {
+            background-color: blue;
+            margin-top: 10px;
+        }
+
+        button.cameraButton {
+            background-color: green;
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background-color: darkred;
+        }
+
+        .center {
+            text-align: center;
+        }
+
+        .error {
+            color: red;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .duplicate {
+            background-color: #ffcccc !important;
+            animation: blink 0.5s alternate infinite;
+        }
+
+        @keyframes blink {
+            from {
+                background-color: transparent;
+            }
+            to {
+                background-color: #ffcccc;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="center">
+        <h2>F<span style="color: green;">.</span>C<span style="color: yellow;">.</span>O</h2>
+    </div>
+
+    <div class="container" id="productContainer">
+        <div class="product">
+            <h3>Código do Produto:</h3>
+            <div class="error" id="errorMessage"></div>
+            <input type="text" placeholder="Digite o código do produto">
+            <h3>Quantidade:</h3>
+            <input type="text" placeholder="Digite a quantidade">
+            <button class="deleteButton" disabled>Excluir</button>
+            <button class="addProductButton">Adicionar Produto</button>
+            <button class="cameraButton">Abrir Câmera</button>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/quagga"></script>
+    <script>
+        document.querySelector('.container').addEventListener('click', function(event) {
+            var container = document.getElementById('productContainer');
+            var products = container.querySelectorAll('.product');
+
+            if (event.target.classList.contains('deleteButton') && products.length > 1) {
+                event.target.parentNode.remove();
+                hideErrorMessage();
+            } else if (event.target.classList.contains('addProductButton')) {
+                var codeInputs = document.querySelectorAll('.product input[type="text"][placeholder="Digite o código do produto"]');
+                var productCodes = new Set();
+                var duplicateFound = false;
+
+                codeInputs.forEach(function(input) {
+                    var code = input.value.trim();
+                    if (productCodes.has(code)) {
+                        duplicateFound = true;
+                        input.parentNode.classList.add('duplicate');
+                    } else {
+                        input.parentNode.classList.remove('duplicate');
+                    }
+                    productCodes.add(code);
+                });
+
+                if (!duplicateFound) {
+                    var productDiv = document.createElement('div');
+                    productDiv.classList.add('container', 'product');
+                    productDiv.innerHTML = `
+                        <h3>Código do Produto:</h3>
+                        <div class="error" id="errorMessage"></div>
+                        <input type="text" placeholder="Digite o código do produto">
+                        <h3>Quantidade:</h3>
+                        <input type="text" placeholder="Digite a quantidade">
+                        <button class="deleteButton">Excluir</button>
+                        <button class="addProductButton">Adicionar Produto</button>
+                        <button class="cameraButton">Abrir Câmera</button>
+                    `;
+                    container.appendChild(productDiv);
+                    hideErrorMessage();
+                } else {
+                    showErrorMessage('Não é possível adicionar outro card com códigos de produto iguais.', container.lastChild);
+                }
+            } else if (event.target.classList.contains('cameraButton')) {
+                openCamera();
+            }
+        });
+
+        function openCamera() {
+            Quagga.init({
+                inputStream: {
+                    name: "Live",
+                    type: "LiveStream",
+                    target: document.querySelector('.container'),
+                    constraints: {
+                        facingMode: "environment"
+                    }
+                },
+                decoder: {
+                    readers: ["ean_reader"]
+                }
+            }, function(err) {
+                if (err) {
+                    console.error(err);
+                    return;
+                }
+                console.log("Initialization finished. Ready to start");
+                Quagga.start();
+            });
+
+            Quagga.onDetected(function(result) {
+                var code = result.codeResult.code;
+                console.log("Barcode detected and processed : [" + code + "]");
+                Quagga.stop();
+                // Adicione lógica para lidar com o código de barras detectado aqui...
+            });
+        }
+
+        function showErrorMessage(message, element) {
+            var errorMessage = element.querySelector('.error');
+            errorMessage.textContent = message;
+        }
+
+        function hideErrorMessage() {
+            var errorMessage = document.getElementById('errorMessage');
+            errorMessage.textContent = '';
+        }
+    </script>
+</body>
+</html>
