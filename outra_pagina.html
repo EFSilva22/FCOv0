@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Seu Componente</title>
+    <title>Ocorrência</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -15,31 +15,38 @@
             max-width: 400px;
             margin: 0 auto;
             padding: 20px;
-            background-color: #f9f9f9; /* Cinza claro */
-            border-radius: 5px;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
             position: relative;
         }
 
         input[type="text"] {
             width: calc(100% - 16px);
-            padding: 8px;
-            margin-top: 5px;
+            padding: 10px;
+            margin-top: 10px;
             border: 1px solid #ccc;
-            border-radius: 3px;
+            border-radius: 4px;
+            box-sizing: border-box;
         }
 
         button {
-            padding: 8px 15px;
-            background-color: red;
+            padding: 10px 20px;
+            background-color: #007BFF;
             color: white;
             border: none;
-            border-radius: 3px;
+            border-radius: 4px;
             cursor: pointer;
             margin-top: 10px;
             width: 100%;
             display: block;
+            transition: background-color 0.3s;
+        }
+
+        button.deleteButton {
+            background-color: red;
+            margin-top: 10px;
         }
 
         button.addProductButton {
@@ -54,6 +61,14 @@
 
         button:hover {
             background-color: darkred;
+        }
+
+        button.addProductButton:hover {
+            background-color: darkblue;
+        }
+
+        button.cameraButton:hover {
+            background-color: darkgreen;
         }
 
         .center {
@@ -101,6 +116,14 @@
 
     <script src="https://cdn.jsdelivr.net/npm/quagga"></script>
     <script>
+        // Verifica se o usuário está logado
+        if (localStorage.getItem('loggedin') !== 'true') {
+            window.location.href = 'login.html';
+        }
+
+        // Lista simulada de códigos de produtos
+        const productList = ['123456789012', '987654321098', '123123123123'];
+
         document.querySelector('.container').addEventListener('click', function(event) {
             var container = document.getElementById('productContainer');
             var products = container.querySelectorAll('.product');
@@ -171,9 +194,16 @@
 
             Quagga.onDetected(function(result) {
                 var code = result.codeResult.code;
-                console.log("Barcode detected and processed : [" + code + "]");
+                console.log("Barcode detected and processed: [" + code + "]");
                 Quagga.stop();
-                // Adicione lógica para lidar com o código de barras detectado aqui...
+
+                // Verifica se o código do produto está na lista
+                if (!productList.includes(code)) {
+                    alert("Produto não encontrado: " + code);
+                } else {
+                    // Lógica adicional para lidar com o código de barras detectado
+                    alert("Produto encontrado: " + code);
+                }
             });
         }
 
